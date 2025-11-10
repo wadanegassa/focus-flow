@@ -1,29 +1,42 @@
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import '../models/task.dart';
 
 class TaskService extends ChangeNotifier {
   final List<Task> _tasks = [];
-  TaskStatus _filterStatus = TaskStatus.pending;
+  TaskStatus? _filterStatus;
   String _searchQuery = '';
+  static const String _tasksKey = 'tasks';
 
   List<Task> get tasks => _tasks;
-  TaskStatus get filterStatus => _filterStatus;
+  TaskStatus? get filterStatus => _filterStatus;
   String get searchQuery => _searchQuery;
 
   List<Task> get filteredTasks {
     List<Task> filtered = _tasks;
 
     // Filter by status
-    if (_filterStatus != TaskStatus.pending) {
-      filtered = filtered.where((task) => task.status == _filterStatus).toList();
+    if (_filterStatus != null) {
+      filtered = filtered
+          .where((task) => task.status == _filterStatus)
+          .toList();
     }
 
     // Filter by search query
     if (_searchQuery.isNotEmpty) {
-      filtered = filtered.where((task) =>
-          task.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          task.description.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          task.category.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+      filtered = filtered
+          .where(
+            (task) =>
+                task.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                task.description.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ) ||
+                task.category.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ),
+          )
+          .toList();
     }
 
     // Sort by priority and due date
@@ -48,9 +61,12 @@ class TaskService extends ChangeNotifier {
     return filtered;
   }
 
-  List<Task> get pendingTasks => _tasks.where((task) => task.status == TaskStatus.pending).toList();
-  List<Task> get inProgressTasks => _tasks.where((task) => task.status == TaskStatus.inProgress).toList();
-  List<Task> get completedTasks => _tasks.where((task) => task.status == TaskStatus.completed).toList();
+  List<Task> get pendingTasks =>
+      _tasks.where((task) => task.status == TaskStatus.pending).toList();
+  List<Task> get inProgressTasks =>
+      _tasks.where((task) => task.status == TaskStatus.inProgress).toList();
+  List<Task> get completedTasks =>
+      _tasks.where((task) => task.status == TaskStatus.completed).toList();
 
   int get totalTasks => _tasks.length;
   int get completedTasksCount => completedTasks.length;
@@ -62,8 +78,26 @@ class TaskService extends ChangeNotifier {
     return completedTasksCount / _tasks.length;
   }
 
+  Future<void> loadTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final tasksJson = prefs.getStringList(_tasksKey) ?? [];
+    _tasks.clear();
+    for (final taskJson in tasksJson) {
+      final taskMap = json.decode(taskJson) as Map<String, dynamic>;
+      _tasks.add(Task.fromJson(taskMap));
+    }
+    notifyListeners();
+  }
+
+  Future<void> _saveTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final tasksJson = _tasks.map((task) => json.encode(task.toJson())).toList();
+    await prefs.setStringList(_tasksKey, tasksJson);
+  }
+
   void addTask(Task task) {
     _tasks.add(task);
+    _saveTasks();
     notifyListeners();
   }
 
@@ -71,12 +105,14 @@ class TaskService extends ChangeNotifier {
     final index = _tasks.indexWhere((task) => task.id == updatedTask.id);
     if (index != -1) {
       _tasks[index] = updatedTask;
+      _saveTasks();
       notifyListeners();
     }
   }
 
   void deleteTask(String taskId) {
     _tasks.removeWhere((task) => task.id == taskId);
+    _saveTasks();
     notifyListeners();
   }
 
@@ -100,11 +136,12 @@ class TaskService extends ChangeNotifier {
           break;
       }
       _tasks[index] = task.copyWith(status: newStatus);
+      _saveTasks();
       notifyListeners();
     }
   }
 
-  void setFilterStatus(TaskStatus status) {
+  void setFilterStatus(TaskStatus? status) {
     _filterStatus = status;
     notifyListeners();
   }
@@ -117,70 +154,5 @@ class TaskService extends ChangeNotifier {
   void clearSearch() {
     _searchQuery = '';
     notifyListeners();
-  }
-
-  // Initialize with sample data
-  void initializeSampleData() {
-    if (_tasks.isEmpty) {
-      final now = DateTime.now();
-      _tasks.addAll([
-        Task(
-          id: '1',
-          title: 'Design new logo',
-          description: 'Create a modern and minimalist logo for the company brand identity',
-          category: 'Personal',
-          createdAt: now.subtract(const Duration(days: 2)),
-          dueDate: now.add(const Duration(days: 3)),
-          priority: TaskPriority.high,
-          status: TaskStatus.pending,
-          tags: ['design', 'branding'],
-        ),
-        Task(
-          id: '2',
-          title: 'Review project proposal',
-          description: 'Review and provide feedback on the Q1 project proposal document',
-          category: 'Work',
-          createdAt: now.subtract(const Duration(days: 1)),
-          dueDate: now.add(const Duration(days: 1)),
-          priority: TaskPriority.urgent,
-          status: TaskStatus.inProgress,
-          tags: ['review', 'documentation'],
-        ),
-        Task(
-          id: '3',
-          title: 'Update documentation',
-          description: 'Update API documentation with latest changes and examples',
-          category: 'Work',
-          createdAt: now.subtract(const Duration(days: 3)),
-          dueDate: now.subtract(const Duration(days: 1)),
-          priority: TaskPriority.medium,
-          status: TaskStatus.completed,
-          tags: ['documentation', 'api'],
-        ),
-        Task(
-          id: '4',
-          title: 'Plan team meeting',
-          description: 'Schedule and prepare agenda for weekly team standup meeting',
-          category: 'Work',
-          createdAt: now.subtract(const Duration(hours: 6)),
-          dueDate: now.add(const Duration(days: 2)),
-          priority: TaskPriority.low,
-          status: TaskStatus.pending,
-          tags: ['meeting', 'planning'],
-        ),
-        Task(
-          id: '5',
-          title: 'Research new technologies',
-          description: 'Research and evaluate new frontend frameworks for upcoming projects',
-          category: 'Learning',
-          createdAt: now.subtract(const Duration(hours: 12)),
-          dueDate: now.add(const Duration(days: 7)),
-          priority: TaskPriority.medium,
-          status: TaskStatus.pending,
-          tags: ['research', 'technology'],
-        ),
-      ]);
-      notifyListeners();
-    }
   }
 }

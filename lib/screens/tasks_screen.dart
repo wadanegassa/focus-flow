@@ -17,7 +17,6 @@ class _TasksScreenState extends State<TasksScreen>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
-  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -27,54 +26,31 @@ class _TasksScreenState extends State<TasksScreen>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.2),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
 
     _animationController.forward();
-    
-    // Initialize sample data
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TaskService>().initializeSampleData();
-    });
   }
 
   @override
   void dispose() {
     _animationController.dispose();
-    _searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final isTablet = screenSize.width > 600;
-    
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Tasks'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              _showSearchDialog(context);
-            },
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('My Tasks')),
       body: Consumer<TaskService>(
         builder: (context, taskService, child) {
           return FadeTransition(
@@ -86,14 +62,17 @@ class _TasksScreenState extends State<TasksScreen>
                   // Filter Chips
                   Container(
                     height: 60,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
                         _buildFilterChip(
                           'All',
-                          taskService.filterStatus == TaskStatus.pending,
-                          () => taskService.setFilterStatus(TaskStatus.pending),
+                          taskService.filterStatus == null,
+                          () => taskService.setFilterStatus(null),
                         ),
                         const SizedBox(width: 8),
                         _buildFilterChip(
@@ -105,18 +84,21 @@ class _TasksScreenState extends State<TasksScreen>
                         _buildFilterChip(
                           'In Progress',
                           taskService.filterStatus == TaskStatus.inProgress,
-                          () => taskService.setFilterStatus(TaskStatus.inProgress),
+                          () => taskService.setFilterStatus(
+                            TaskStatus.inProgress,
+                          ),
                         ),
                         const SizedBox(width: 8),
                         _buildFilterChip(
                           'Completed',
                           taskService.filterStatus == TaskStatus.completed,
-                          () => taskService.setFilterStatus(TaskStatus.completed),
+                          () =>
+                              taskService.setFilterStatus(TaskStatus.completed),
                         ),
                       ],
                     ),
                   ),
-                  
+
                   // Task Stats
                   Container(
                     margin: const EdgeInsets.all(16),
@@ -151,7 +133,7 @@ class _TasksScreenState extends State<TasksScreen>
                       ],
                     ),
                   ),
-                  
+
                   // Tasks List
                   Expanded(
                     child: taskService.filteredTasks.isEmpty
@@ -175,9 +157,7 @@ class _TasksScreenState extends State<TasksScreen>
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const AddEditTaskScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const AddEditTaskScreen()),
           );
         },
         child: const Icon(Icons.add),
@@ -195,7 +175,12 @@ class _TasksScreenState extends State<TasksScreen>
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -205,17 +190,11 @@ class _TasksScreenState extends State<TasksScreen>
             const SizedBox(height: 8),
             Text(
               value,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Text(
               title,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
           ],
         ),
@@ -260,10 +239,7 @@ class _TasksScreenState extends State<TasksScreen>
               task.description,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.grey[600], fontSize: 14),
             ),
             const SizedBox(height: 8),
             Row(
@@ -317,11 +293,7 @@ class _TasksScreenState extends State<TasksScreen>
             const PopupMenuItem(
               value: 'edit',
               child: Row(
-                children: [
-                  Icon(Icons.edit),
-                  SizedBox(width: 8),
-                  Text('Edit'),
-                ],
+                children: [Icon(Icons.edit), SizedBox(width: 8), Text('Edit')],
               ),
             ),
             const PopupMenuItem(
@@ -388,29 +360,29 @@ class _TasksScreenState extends State<TasksScreen>
     final now = DateTime.now();
     final isOverdue = dueDate.isBefore(now) && !dueDate.isSameDay(now);
     final isToday = dueDate.isSameDay(now);
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isOverdue 
+        color: isOverdue
             ? Colors.red.withOpacity(0.1)
-            : isToday 
-                ? Colors.orange.withOpacity(0.1)
-                : Colors.grey.withOpacity(0.1),
+            : isToday
+            ? Colors.orange.withOpacity(0.1)
+            : Colors.grey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        isToday 
+        isToday
             ? 'Today'
-            : isOverdue 
-                ? 'Overdue'
-                : '${dueDate.day}/${dueDate.month}',
+            : isOverdue
+            ? 'Overdue'
+            : '${dueDate.day}/${dueDate.month}',
         style: TextStyle(
-          color: isOverdue 
+          color: isOverdue
               ? Colors.red
-              : isToday 
-                  ? Colors.orange
-                  : Colors.grey[600],
+              : isToday
+              ? Colors.orange
+              : Colors.grey[600],
           fontSize: 12,
           fontWeight: FontWeight.w500,
         ),
@@ -423,11 +395,7 @@ class _TasksScreenState extends State<TasksScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.task_alt_outlined,
-            size: 80,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.task_alt_outlined, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             'No tasks found',
@@ -440,9 +408,7 @@ class _TasksScreenState extends State<TasksScreen>
           const SizedBox(height: 8),
           Text(
             'Create your first task to get started',
-            style: TextStyle(
-              color: Colors.grey[500],
-            ),
+            style: TextStyle(color: Colors.grey[500]),
           ),
         ],
       ),
@@ -486,39 +452,6 @@ class _TasksScreenState extends State<TasksScreen>
       case TaskPriority.urgent:
         return Colors.red;
     }
-  }
-
-  void _showSearchDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Search Tasks'),
-        content: TextField(
-          controller: _searchController,
-          decoration: const InputDecoration(
-            hintText: 'Search by title, description, or category...',
-            prefixIcon: Icon(Icons.search),
-          ),
-          onChanged: (value) {
-            context.read<TaskService>().setSearchQuery(value);
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              _searchController.clear();
-              context.read<TaskService>().clearSearch();
-              Navigator.pop(context);
-            },
-            child: const Text('Clear'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
   }
 
   void _showDeleteDialog(Task task, TaskService taskService) {

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:task/screens/home.dart';
-import 'package:task/screens/login.dart';
 import 'package:task/screens/onboarding.dart';
-import 'package:task/screens/register.dart';
 import 'package:task/screens/splash_screen.dart';
 import 'package:task/screens/tasks_screen.dart';
 import 'package:task/screens/profile_screen.dart';
@@ -20,8 +18,6 @@ class Routes {
     return {
       Routes.splash: (context) => const SplashScreen(),
       Routes.onboarding: (context) => const OnboardingScreen(),
-      Routes.login: (context) => const LoginScreen(),
-      Routes.register: (context) => const RegisterScreen(),
       Routes.home: (context) => const HomeScreen(),
       Routes.tasks: (context) => const TasksScreen(),
       Routes.profile: (context) => const ProfileScreen(),

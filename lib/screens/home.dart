@@ -12,8 +12,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with TickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -27,28 +26,19 @@ class _HomeScreenState extends State<HomeScreen>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.2),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
 
     _animationController.forward();
-    
-    // Initialize sample data
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TaskService>().initializeSampleData();
-    });
   }
 
   @override
@@ -56,11 +46,12 @@ class _HomeScreenState extends State<HomeScreen>
     _animationController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final isTablet = screenSize.width > 600;
-    
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -69,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen>
         title: Column(
           children: [
             Text(
-              'Good Morning, Wada 👋',
+              'Good Morning 👋',
               style: TextStyle(
                 fontSize: isTablet ? 20 : 18,
                 fontWeight: FontWeight.w600,
@@ -115,10 +106,7 @@ class _HomeScreenState extends State<HomeScreen>
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [
-                            Colors.blue,
-                            Colors.blue.shade600,
-                          ],
+                          colors: [Colors.blue, Colors.blue.shade600],
                         ),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
@@ -160,8 +148,13 @@ class _HomeScreenState extends State<HomeScreen>
                                   SizedBox(height: isTablet ? 8 : 6),
                                   LinearProgressIndicator(
                                     value: taskService.completionPercentage,
-                                    backgroundColor: Colors.white.withOpacity(0.3),
-                                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                                    backgroundColor: Colors.white.withOpacity(
+                                      0.3,
+                                    ),
+                                    valueColor:
+                                        const AlwaysStoppedAnimation<Color>(
+                                          Colors.white,
+                                        ),
                                     minHeight: 6,
                                   ),
                                 ],
@@ -184,12 +177,14 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
                     ),
-                    
+
                     SizedBox(height: isTablet ? 30 : 25),
-                    
+
                     // Quick Stats Section
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: isTablet ? 25 : 20),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isTablet ? 25 : 20,
+                      ),
                       child: Text(
                         'Quick Stats',
                         style: TextStyle(
@@ -199,12 +194,14 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
                     ),
-                    
+
                     SizedBox(height: isTablet ? 20 : 15),
-                    
+
                     // Stats Cards
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: isTablet ? 20 : 16),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isTablet ? 20 : 16,
+                      ),
                       child: Row(
                         children: [
                           Expanded(
@@ -219,7 +216,8 @@ class _HomeScreenState extends State<HomeScreen>
                           Expanded(
                             child: _buildStatCard(
                               title: 'In Progress',
-                              value: '${taskService.inProgressTasksCount} tasks',
+                              value:
+                                  '${taskService.inProgressTasksCount} tasks',
                               icon: Icons.hourglass_empty,
                               color: Colors.orange,
                             ),
@@ -227,12 +225,14 @@ class _HomeScreenState extends State<HomeScreen>
                         ],
                       ),
                     ),
-                    
+
                     SizedBox(height: isTablet ? 30 : 25),
-                    
+
                     // Daily Motivation Card
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: isTablet ? 20 : 16),
+                      margin: EdgeInsets.symmetric(
+                        horizontal: isTablet ? 20 : 16,
+                      ),
                       child: Card(
                         elevation: 3,
                         shape: RoundedRectangleBorder(
@@ -285,12 +285,14 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
                     ),
-                    
+
                     SizedBox(height: isTablet ? 30 : 25),
-                    
+
                     // Recent Tasks Section
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: isTablet ? 25 : 20),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isTablet ? 25 : 20,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -311,19 +313,21 @@ class _HomeScreenState extends State<HomeScreen>
                         ],
                       ),
                     ),
-                    
+
                     SizedBox(height: isTablet ? 20 : 15),
-                    
+
                     // Task List
                     taskService.tasks.isEmpty
                         ? _buildEmptyState()
                         : Column(
                             children: taskService.tasks
                                 .take(3)
-                                .map((task) => _buildTaskCard(task, taskService))
+                                .map(
+                                  (task) => _buildTaskCard(task, taskService),
+                                )
                                 .toList(),
                           ),
-                    
+
                     SizedBox(height: isTablet ? 30 : 25),
                   ],
                 ),
@@ -340,7 +344,7 @@ class _HomeScreenState extends State<HomeScreen>
           setState(() {
             _selectedIndex = index;
           });
-          
+
           // Navigate to different screens based on selected index
           switch (index) {
             case 0:
@@ -386,12 +390,10 @@ class _HomeScreenState extends State<HomeScreen>
   }) {
     final screenSize = MediaQuery.of(context).size;
     final isTablet = screenSize.width > 600;
-    
+
     return Card(
       elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: EdgeInsets.all(isTablet ? 20 : 16),
         child: Column(
@@ -403,11 +405,7 @@ class _HomeScreenState extends State<HomeScreen>
               ),
               height: isTablet ? 50 : 40,
               width: isTablet ? 50 : 40,
-              child: Icon(
-                icon,
-                color: color,
-                size: isTablet ? 25 : 20,
-              ),
+              child: Icon(icon, color: color, size: isTablet ? 25 : 20),
             ),
             SizedBox(height: isTablet ? 12 : 10),
             Text(
@@ -436,7 +434,7 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _buildTaskCard(Task task, TaskService taskService) {
     final screenSize = MediaQuery.of(context).size;
     final isTablet = screenSize.width > 600;
-    
+
     return Container(
       margin: EdgeInsets.symmetric(
         horizontal: isTablet ? 20 : 16,
@@ -444,9 +442,7 @@ class _HomeScreenState extends State<HomeScreen>
       ),
       child: Card(
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: ListTile(
           contentPadding: EdgeInsets.symmetric(
             horizontal: isTablet ? 20 : 16,
@@ -473,8 +469,12 @@ class _HomeScreenState extends State<HomeScreen>
             style: TextStyle(
               fontSize: isTablet ? 16 : 14,
               fontWeight: FontWeight.w600,
-              decoration: task.status == TaskStatus.completed ? TextDecoration.lineThrough : null,
-              color: task.status == TaskStatus.completed ? Colors.grey.shade600 : Colors.black87,
+              decoration: task.status == TaskStatus.completed
+                  ? TextDecoration.lineThrough
+                  : null,
+              color: task.status == TaskStatus.completed
+                  ? Colors.grey.shade600
+                  : Colors.black87,
             ),
           ),
           subtitle: Column(
@@ -521,11 +521,7 @@ class _HomeScreenState extends State<HomeScreen>
           padding: const EdgeInsets.all(40),
           child: Column(
             children: [
-              Icon(
-                Icons.task_alt_outlined,
-                size: 80,
-                color: Colors.grey[400],
-              ),
+              Icon(Icons.task_alt_outlined, size: 80, color: Colors.grey[400]),
               const SizedBox(height: 16),
               Text(
                 'No tasks yet',
@@ -538,9 +534,7 @@ class _HomeScreenState extends State<HomeScreen>
               const SizedBox(height: 8),
               Text(
                 'Create your first task to get started',
-                style: TextStyle(
-                  color: Colors.grey[500],
-                ),
+                style: TextStyle(color: Colors.grey[500]),
               ),
               const SizedBox(height: 20),
               ElevatedButton.icon(
