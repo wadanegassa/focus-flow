@@ -201,7 +201,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       // Skip button
                       TextButton(
                         onPressed: () {
-                          Navigator.pushReplacementNamed(context, Routes.login);
+                          Navigator.pushReplacementNamed(context, Routes.home);
                         },
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.symmetric(

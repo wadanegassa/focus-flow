@@ -12,7 +12,15 @@ class DrawerWidget extends StatelessWidget {
         children: [
           Container(
             height: 120,
-            color: Colors.blue,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16),
+              ),
+              gradient: LinearGradient(
+                colors: [Colors.blue.shade400, Colors.blue.shade700],
+              ),
+            ),
             child: const Center(
               child: Text(
                 'Focus Flow',
@@ -53,9 +61,8 @@ class DrawerWidget extends StatelessWidget {
 
           const Divider(),
 
-
           _buildDrawerItem(
-           icon: Icons.info_outline,
+            icon: Icons.info_outline,
             title: 'About',
             onTap: () {
               Navigator.pop(context);

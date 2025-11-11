@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         title: Column(
           children: [
             Text(
-              'Good Morning 👋',
+              'Hello ',
               style: TextStyle(
                 fontSize: isTablet ? 20 : 18,
                 fontWeight: FontWeight.w600,
@@ -344,11 +344,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           setState(() {
             _selectedIndex = index;
           });
-
-          // Navigate to different screens based on selected index
           switch (index) {
             case 0:
-              // Already on home screen
+              Navigator.pushNamed(context, Routes.home);
               break;
             case 1:
               Navigator.pushNamed(context, Routes.tasks);
@@ -373,9 +371,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             label: 'Tasks',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_2_outlined),
-            activeIcon: Icon(Icons.person_2),
-            label: 'Profile',
+            icon: Icon(Icons.list_alt),
+            activeIcon: Icon(Icons.list_alt_outlined),
+            label: 'more',
           ),
         ],
       ),
@@ -515,10 +513,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _buildEmptyState() {
     return Container(
-      margin: const EdgeInsets.all(20),
+      margin: const EdgeInsets.all(40),
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(40),
+          padding: const EdgeInsets.all(50),
           child: Column(
             children: [
               Icon(Icons.task_alt_outlined, size: 80, color: Colors.grey[400]),
